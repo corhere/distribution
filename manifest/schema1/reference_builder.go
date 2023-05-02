@@ -12,9 +12,12 @@ import (
 	"github.com/opencontainers/go-digest"
 )
 
-// referenceManifestBuilder is a type for constructing manifests from schema1
+// ReferenceManifestBuilder is a type for constructing manifests from schema1
 // dependencies.
-type referenceManifestBuilder struct {
+//
+// Deprecated: Docker Image Manifest v2, Schema 1 is deprecated since 2015.
+// Use Docker Image Manifest v2, Schema 2, or the OCI Image Specification.
+type ReferenceManifestBuilder struct {
 	Manifest
 	pk libtrust.PrivateKey
 }
@@ -24,13 +27,13 @@ type referenceManifestBuilder struct {
 //
 // Deprecated: Docker Image Manifest v2, Schema 1 is deprecated since 2015.
 // Use Docker Image Manifest v2, Schema 2, or the OCI Image Specification.
-func NewReferenceManifestBuilder(pk libtrust.PrivateKey, ref reference.Named, architecture string) distribution.ManifestBuilder {
+func NewReferenceManifestBuilder(pk libtrust.PrivateKey, ref reference.Named, architecture string) *ReferenceManifestBuilder {
 	tag := ""
 	if tagged, isTagged := ref.(reference.Tagged); isTagged {
 		tag = tagged.Tag()
 	}
 
-	return &referenceManifestBuilder{
+	return &ReferenceManifestBuilder{
 		Manifest: Manifest{
 			Versioned: manifest.Versioned{
 				SchemaVersion: 1,
@@ -43,7 +46,11 @@ func NewReferenceManifestBuilder(pk libtrust.PrivateKey, ref reference.Named, ar
 	}
 }
 
-func (mb *referenceManifestBuilder) Build(ctx context.Context) (distribution.Manifest, error) {
+// Build creates the manifest from this builder.
+//
+// Deprecated: Docker Image Manifest v2, Schema 1 is deprecated since 2015.
+// Use Docker Image Manifest v2, Schema 2, or the OCI Image Specification.
+func (mb *ReferenceManifestBuilder) Build(ctx context.Context) (distribution.Manifest, error) {
 	m := mb.Manifest
 	if len(m.FSLayers) == 0 {
 		return nil, errors.New("cannot build manifest with zero layers or history")
@@ -61,7 +68,7 @@ func (mb *referenceManifestBuilder) Build(ctx context.Context) (distribution.Man
 //
 // Deprecated: Docker Image Manifest v2, Schema 1 is deprecated since 2015.
 // Use Docker Image Manifest v2, Schema 2, or the OCI Image Specification.
-func (mb *referenceManifestBuilder) AppendReference(d distribution.Describable) error {
+func (mb *ReferenceManifestBuilder) AppendReference(d distribution.Describable) error {
 	r, ok := d.(Reference)
 	if !ok {
 		return fmt.Errorf("unable to add non-reference type to v1 builder")
@@ -77,7 +84,7 @@ func (mb *referenceManifestBuilder) AppendReference(d distribution.Describable) 
 //
 // Deprecated: Docker Image Manifest v2, Schema 1 is deprecated since 2015.
 // Use Docker Image Manifest v2, Schema 2, or the OCI Image Specification.
-func (mb *referenceManifestBuilder) References() []distribution.Descriptor {
+func (mb *ReferenceManifestBuilder) References() []distribution.Descriptor {
 	refs := make([]distribution.Descriptor, len(mb.Manifest.FSLayers))
 	for i := range mb.Manifest.FSLayers {
 		layerDigest := mb.Manifest.FSLayers[i].BlobSum
