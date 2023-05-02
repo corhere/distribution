@@ -252,14 +252,12 @@ func (mb *ConfigManifestBuilder) emptyTar(ctx context.Context) (digest.Digest, e
 //
 // Deprecated: Docker Image Manifest v2, Schema 1 is deprecated since 2015.
 // Use Docker Image Manifest v2, Schema 2, or the OCI Image Specification.
-func (mb *ConfigManifestBuilder) AppendReference(d distribution.Describable) error {
-	descriptor := d.Descriptor()
-
-	if err := descriptor.Digest.Validate(); err != nil {
+func (mb *ConfigManifestBuilder) AppendReference(d distribution.Descriptor) error {
+	if err := d.Digest.Validate(); err != nil {
 		return err
 	}
 
-	mb.descriptors = append(mb.descriptors, descriptor)
+	mb.descriptors = append(mb.descriptors, d)
 	return nil
 }
 
